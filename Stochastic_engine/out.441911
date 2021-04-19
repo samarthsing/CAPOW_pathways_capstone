@@ -1,0 +1,44 @@
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@n2e4-4>
+Subject: Job 441911: <python stochastic_engine.py> in cluster <henry2> Exited
+
+Job <python stochastic_engine.py> was submitted from host <login01> by user <jawessel> in cluster <henry2> at Mon Aug 17 11:07:00 2020
+Job was executed on host(s) <n2e4-4>, in queue <serial>, as user <jawessel> in cluster <henry2> at Mon Aug 17 11:07:05 2020
+</home/jawessel> was used as the home directory.
+</share/infews/jawessel/CAPOW_jaw/Stochastic_engine> was used as the working directory.
+Started at Mon Aug 17 11:07:05 2020
+Terminated at Thu Aug 20 22:26:58 2020
+Results reported at Thu Aug 20 22:26:58 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python stochastic_engine.py
+------------------------------------------------------------
+
+TERM_RUNLIMIT: job killed after reaching LSF run time limit.
+Exited with exit code 140.
+
+Resource usage summary:
+
+    CPU time :                                   268925.31 sec.
+    Max Memory :                                 4466.93 MB
+    Average Memory :                             3732.66 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   17592186044416 MB
+    Max Processes :                              3
+    Max Threads :                                11
+    Run time :                                   300016 sec.
+    Turnaround time :                            299998 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <err.441911> for stderr output of this job.
+

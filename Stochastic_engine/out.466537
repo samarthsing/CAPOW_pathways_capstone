@@ -1,0 +1,44 @@
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@n3m3-5>
+Subject: Job 466537: <python stochastic_engine_partial.py> in cluster <henry2> Exited
+
+Job <python stochastic_engine_partial.py> was submitted from host <login04> by user <jawessel> in cluster <henry2> at Sat Aug 22 13:00:49 2020
+Job was executed on host(s) <n3m3-5>, in queue <serial>, as user <jawessel> in cluster <henry2> at Sat Aug 22 13:00:54 2020
+</home/jawessel> was used as the home directory.
+</share/infews/jawessel/CAPOW_jaw/Stochastic_engine> was used as the working directory.
+Started at Sat Aug 22 13:00:54 2020
+Terminated at Wed Aug 26 00:20:59 2020
+Results reported at Wed Aug 26 00:20:59 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python stochastic_engine_partial.py
+------------------------------------------------------------
+
+TERM_RUNLIMIT: job killed after reaching LSF run time limit.
+Exited with exit code 140.
+
+Resource usage summary:
+
+    CPU time :                                   266965.28 sec.
+    Max Memory :                                 2176.41 MB
+    Average Memory :                             828.96 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   2 MB
+    Max Processes :                              3
+    Max Threads :                                4
+    Run time :                                   300014 sec.
+    Turnaround time :                            300010 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <err.466537> for stderr output of this job.
+
