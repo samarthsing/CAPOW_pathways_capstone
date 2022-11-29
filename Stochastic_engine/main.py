@@ -15,7 +15,7 @@
 ##################################################################################
 import numpy as np
 import pandas as pd
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import cord
 from cord import *
 from datetime import datetime
@@ -25,12 +25,11 @@ import sys
 from configobj import ConfigObj
 import json
 from distutils.util import strtobool
-#import copy
+import copy
 
-def sim(sim_years):
-
-    sim_years = 100    
-    
+def sim(sim_years,job_id):
+    #sim_years=5
+    #job_id=4
     path_model = './'
     #path_model = sys.argv[1]
     print (sys.argv)
@@ -97,12 +96,14 @@ def sim(sim_years):
       scenarios = json.load(f)
     scenario = scenarios[scenario_name]
     results_folder = output_directory + '/' + scenario_name
+#    os.makedirs(results_folder)
     if not os.path.exists(results_folder):        
         os.makedirs(results_folder)
     shutil.copy('cord/data/input/runtime_params.ini', results_folder + '/runtime_params.ini')
     
     # make separate output folder for each processor
     results_folder = results_folder + '/p' + str(rank)
+#    os.makedirs(results_folder)
     if not os.path.exists(results_folder):        
         os.makedirs(results_folder)
     
@@ -132,7 +133,7 @@ def sim(sim_years):
     # Loop though all samples, run sensitivity analysis. If parallel, k runs only through subset of samples for each processor.
     # =============================================================================
     for k in range(start, stop):
-    
+      #k=0
       print('#######################################################')
       print('Sample ' + str(k) + ' start')
       sys.stdout.flush()
@@ -156,12 +157,12 @@ def sim(sim_years):
         #Initialize flow input scenario based on sensitivity sample
         new_inputs = Inputter(base_data_file, expected_release_datafile, model_mode, results_folder, k, sensitivity_sample_names, sensitivity_sample, use_sensitivity = True)
         new_inputs.run_initialization('XXX')
-        new_inputs.run_routine(flow_input_type, flow_input_source)
-        input_data_file = results_folder + '/' + new_inputs.export_series[flow_input_type][flow_input_source]  + "_"  + str(k) + ".csv"
+        new_inputs.run_routine(flow_input_type, flow_input_source,job_id)
+        input_data_file = results_folder + '/' + new_inputs.export_series[flow_input_type][flow_input_source]  + "_"  + str(k) +"_"+str(job_id)+ ".csv"
     
         modelno = Model(input_data_file, expected_release_datafile, model_mode, demand_type, k, sensitivity_sample_names, sensitivity_sample, new_inputs.sensitivity_factors)
         modelso = Model(input_data_file, expected_release_datafile, model_mode, demand_type, k, sensitivity_sample_names, sensitivity_sample, new_inputs.sensitivity_factors)
-        os.remove(input_data_file)
+        #os.remove(input_data_file)
     
         modelso.max_tax_free = {}
         modelso.omr_rule_start, modelso.max_tax_free = modelno.northern_initialization_routine(startTime)
@@ -186,8 +187,7 @@ def sim(sim_years):
         noresR = np.zeros((timeseries_length,len(noresnames)))
         soresR = np.zeros((timeseries_length,len(soresnames)))
                
-        # for t in range(0,timeseries_length):
-        for t in range(0,5): 
+        for t in range(0,timeseries_length):
           print(t)
           if (t % 365 == 364):
             print('Year ', (t+1)/365, ', ', datetime.now() - startTime)
@@ -217,8 +217,8 @@ def sim(sim_years):
     combined = combined[93:-273]
     df_combined = pd.DataFrame(combined)
     df_combined.columns = ['SHA_otf','ORO_otf','YRS_otf','FOL_otf','NML_otf','DNP_otf','EXC_otf','MIL_otf','ISB_otf','SUC_otf','KWH_otf','PFT_otf']
-    df_combined.to_csv('ORCA_output.csv')
-     
+    df_combined.to_csv('ORCA_output_{}.csv'.format(job_id))
+ 
     return None
 
 #    # for n in new_inputs.sensitivity_factors['factor_list']:

@@ -13,7 +13,7 @@ import numpy as np
 import random
 from copy import deepcopy
 
-def synthetic(sim_years):
+def synthetic(sim_years,job_id):
 #########################################################################
 # This purpose of this script is to use daily temperature and wind profiles, and 
 # a covariance matrix that describes statistical dependencies
@@ -128,12 +128,12 @@ def synthetic(sim_years):
     # and average profiles
     
     # synthetic weather as sum of residuals and average profiles, re-seasoned
-    sim_weather=np.zeros((sim_days,fields-7))
+    sim_weather=np.zeros((sim_days,fields-10))
     n=0
     
     # for each simulated day
     for i in range(0,sim_days):
-        for j in range(0,fields-7):
+        for j in range(0,fields-10):
             if j in range(1,34,2):
             # adjust simulated residuals so they're unit (=1) standard deviation, re-season, and add back 
             # mean profile
@@ -151,9 +151,9 @@ def synthetic(sim_years):
             n=0
     
     n=0
-    sim_irr=np.zeros((sim_days,7))
+    sim_irr=np.zeros((sim_days,10))
     for i in range(0,sim_days):
-        for j in range(0,7):
+        for j in range(0,10):
             sim_irr[i,j]=(sim_residuals[i,j+34]*(1/np.std(sim_residuals[:,j+34]))*S_std[n,j]) +S_ave[n,j]
         n=n+1
         if n >= 365:
@@ -274,7 +274,7 @@ def synthetic(sim_years):
         sim_weather3[i*365:i*365+365,range(1,34,2)]=sim_weather[int(year_list[i])*365:int(year_list[i])*365+365,range(1,34,2)]
     
     
-    sim_irr2=np.zeros((sim_days,7))
+    sim_irr2=np.zeros((sim_days,10))
     sim_irr[sim_irr<0]=0
     for i in range(0,sim_years):
         sim_irr2[i*365:i*365+365,:]=Clear_sky-sim_irr[int(year_list[i])*365:int(year_list[i])*365+365,:]
@@ -294,11 +294,11 @@ def synthetic(sim_years):
     
     df_sim2 = pd.DataFrame(sim_weather3)
     df_sim2.columns = headers    
-    df_sim2.to_csv('Synthetic_weather/synthetic_weather_data.csv')
+    df_sim2.to_csv('Synthetic_weather/synthetic_weather_data_{}.csv'.format(job_id))
     
     df_sim_irr=pd.DataFrame(sim_irr2)
     df_sim_irr.columns=headers2
-    df_sim_irr.to_csv('Synthetic_weather/synthetic_irradiance_data.csv')
+    df_sim_irr.to_csv('Synthetic_weather/synthetic_irradiance_data_{}.csv'.format(job_id))
     
 
     return None

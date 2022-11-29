@@ -9,15 +9,15 @@ import pandas as pd
 import numpy as np
 from pandas import ExcelWriter
 
-def setup(year,scenario,PNW_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff):
+def setup(year,scenario,PNW_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff,job_id):
 
     #read generator parameters into DataFrame
     df_gen = pd.read_csv('PNW_data_file/generators.csv',header=0)
 
     zone = ['PNW']
     ##time series of load for each zone
-    filename = 'Synthetic_demand_pathflows/Sim_hourly_load_' + scenario + '.csv'
-    df_load = pd.read_csv(filename,header=0)
+    filename = 'Synthetic_demand_pathflows/Sim_hourly_load_' + scenario + '_{}.csv'
+    df_load = pd.read_csv(filename.format(job_id),header=0)
     df_load = df_load[zone]
     df_load = df_load.loc[year*8760:year*8760+8759,:]
     df_load = df_load.reset_index(drop=True)
@@ -31,45 +31,45 @@ def setup(year,scenario,PNW_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff):
     df_reserves.columns = ['reserves']
     
     ##daily hydropower availability
-    df_hydro = pd.read_csv('Hydro_setup/PNW_dispatchable_hydro.csv',header=0)
+    df_hydro = pd.read_csv('Hydro_setup/PNW_dispatchable_hydro_{}.csv'.format(job_id),header=0)
 
     ##time series of wind generation for each zone
-    df_wind = pd.read_csv('Synthetic_wind_power/wind_power_sim.csv',header=0)
+    df_wind = pd.read_csv('Synthetic_wind_power/wind_power_sim_{}.csv'.format(job_id),header=0)
     header = scenario + '_PNW'
     df_wind = df_wind.loc[:,header]
     df_wind = df_wind.loc[year*8760:year*8760+8759]
     df_wind = df_wind.reset_index(drop=True)
 
     ##time series solar for each TAC
-    df_solar = pd.read_csv('Synthetic_solar_power/solar_power_sim.csv',header=0)
+    df_solar = pd.read_csv('Synthetic_solar_power/solar_power_sim_{}.csv'.format(job_id),header=0)
     header = scenario + '_PNW'
     df_solar = df_solar.loc[:,header]
     df_solar = df_solar.loc[year*8760:year*8760+8759]
     df_solar = df_solar.reset_index(drop=True)
 
     ##daily time series of dispatchable imports by path
-    filename = 'Path_setup/PNW_dispatchable_imports_' + scenario + '.csv'
-    df_imports = pd.read_csv(filename,header=0)
+    filename = 'Path_setup/PNW_dispatchable_imports_' + scenario + '_{}.csv'
+    df_imports = pd.read_csv(filename.format(job_id),header=0)
     
     ##hourly time series of exports by zone
-    filename = 'Path_setup/PNW_exports_' + scenario + '.csv'
-    df_exports = pd.read_csv(filename,header=0)
+    filename = 'Path_setup/PNW_exports_' + scenario + '_{}.csv'
+    df_exports = pd.read_csv(filename.format(job_id),header=0)
 
     #must run resources (LFG,ag_waste,nuclear)
     df_must = pd.read_csv('PNW_data_file/must_run.csv',header=0)
 
     #natural gas prices
-    df_ng = pd.read_excel('Gas_prices/NG.xlsx', header=0)
+    df_ng = pd.read_excel('Gas_prices/NG_{}.xlsx'.format(job_id), header=0)
     df_ng = df_ng[zone]
     df_ng = df_ng.loc[year*365:year*365+364,:]
     df_ng = df_ng.reset_index()
 
     #imports hourly minimum flows
-    filename = 'Path_setup/PNW_path_mins_' + scenario + '.csv'
-    df_PNW_import_mins = pd.read_csv(filename, header=0)
+    filename = 'Path_setup/PNW_path_mins_' + scenario + '_{}.csv'
+    df_PNW_import_mins = pd.read_csv(filename.format(job_id), header=0)
 
     #california hydro hourly minimum flows
-    df_PNW_hydro_mins = pd.read_csv('Hydro_setup/PNW_hydro_mins.csv', header=0)
+    df_PNW_hydro_mins = pd.read_csv('Hydro_setup/PNW_hydro_mins_{}.csv'.format(job_id), header=0)
 
     #list zones
     zones = ['PNW']

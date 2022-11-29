@@ -8,10 +8,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-def exchange(year,scenario):
+def exchange(year,scenario,job_id):
 
-    filename = 'Synthetic_demand_pathflows/Load_Path_Sim_' + scenario + '.csv' 
-    df_data = pd.read_csv(filename,header=0)
+    filename = 'Synthetic_demand_pathflows/Load_Path_Sim_' + scenario + '_{}.csv' 
+    df_data = pd.read_csv(filename.format(job_id),header=0)
     c = ['Path3_sim','Path8_sim','Path14_sim','Path65_sim','Path66_sim']
     df_data = df_data[c]
     paths = ['Path3','Path8','Path14','Path65','Path66']
@@ -35,8 +35,8 @@ def exchange(year,scenario):
                 if imports.loc[i,p] < 0:
                     imports.loc[i,p] = 0
     
-    filename = 'Path_setup/PNW_imports_' + scenario + '.csv'
-    imports.to_csv(filename)
+    filename = 'Path_setup/PNW_imports_' + scenario + '_{}.csv'
+    imports.to_csv(filename.format(job_id))
     
     # convert to minimum flow time series and dispatchable (daily)
     df_mins = pd.read_excel('Path_setup/PNW_imports_minflow_profiles.xlsx',header=0)
@@ -53,8 +53,8 @@ def exchange(year,scenario):
                 imports.loc[i,L] = np.max((0,imports.loc[i,L]-df_mins.loc[i,L]))
     
     dispatchable_imports = imports*24
-    filename = 'Path_setup/PNW_dispatchable_imports_' + scenario + '.csv'
-    dispatchable_imports.to_csv(filename)
+    filename = 'Path_setup/PNW_dispatchable_imports_' + scenario + '_{}.csv'
+    dispatchable_imports.to_csv(filename.format(job_id))
     
     df_data = imports.copy(deep=True)
     
@@ -69,12 +69,12 @@ def exchange(year,scenario):
             
     H = pd.DataFrame(hourly)
     H.columns = ['Path3','Path8','Path14','Path65','Path66']
-    filename = 'Path_setup/PNW_path_mins_' + scenario + '.csv'
-    H.to_csv(filename)
+    filename = 'Path_setup/PNW_path_mins_' + scenario + '_{}.csv'
+    H.to_csv(filename.format(job_id))
     
     # hourly exports
-    filename = 'Synthetic_demand_pathflows/Load_Path_Sim_' + scenario + '.csv'
-    df_data = pd.read_csv(filename,header=0)
+    filename = 'Synthetic_demand_pathflows/Load_Path_Sim_' + scenario + '_{}.csv'
+    df_data = pd.read_csv(filename.format(job_id),header=0)
     c = ['Path3_sim','Path8_sim','Path14_sim','Path65_sim','Path66_sim']
     df_data = df_data[c]
     df_data.columns = [paths]
@@ -104,8 +104,8 @@ def exchange(year,scenario):
             e[i,3] = 3800
     exports = pd.DataFrame(e) 
     exports.columns = ['Path3','Path8','Path14','Path65','Path66']
-    filename = 'Path_setup/PNW_exports_' + scenario + '.csv'
-    exports.to_csv(filename)
+    filename = 'Path_setup/PNW_exports_' + scenario + '_{}.csv'
+    exports.to_csv(filename.format(job_id))
     
     
     ##########################
@@ -115,7 +115,7 @@ def exchange(year,scenario):
     
     # convert to minimum flow time series and dispatchable (daily)
     
-    df_data = pd.read_excel('PNW_hydro/PNW_hydro_daily.xlsx',header=0)
+    df_data = pd.read_excel('PNW_hydro/PNW_hydro_daily_{}.xlsx'.format(job_id),header=0)
     hydro = df_data.loc[year*365:year*365+364,'PNW']
     hydro = hydro.reset_index()
     df_mins = pd.read_excel('Hydro_setup/Minimum_hydro_profiles.xlsx',header=0)
@@ -130,12 +130,12 @@ def exchange(year,scenario):
             hydro.loc[i,'PNW'] = np.max((0,hydro.loc[i,'PNW']-df_mins.loc[i,'PNW']*24))
     
     dispatchable_hydro = hydro
-    dispatchable_hydro.to_csv('Hydro_setup/PNW_dispatchable_hydro.csv')
+    dispatchable_hydro.to_csv('Hydro_setup/PNW_dispatchable_hydro_{}.csv'.format(job_id))
     
     # hourly minimum flow for hydro
     hourly = np.zeros((8760,1))
     
-    df_data = pd.read_excel('PNW_hydro/PNW_hydro_daily.xlsx',header=0)
+    df_data = pd.read_excel('PNW_hydro/PNW_hydro_daily_{}.xlsx'.format(job_id),header=0)
     hydro = df_data.loc[year*365:year*365+364,'PNW']
     hydro = hydro.reset_index()
         
@@ -145,6 +145,6 @@ def exchange(year,scenario):
             
     H = pd.DataFrame(hourly)
     H.columns = ['PNW']
-    H.to_csv('Hydro_setup/PNW_hydro_mins.csv')
+    H.to_csv('Hydro_setup/PNW_hydro_mins_{}.csv'.format(job_id))
 
     return None

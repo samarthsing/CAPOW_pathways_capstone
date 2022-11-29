@@ -13,6 +13,16 @@ Created on Tue May  8 09:09:37 2018
 #initialize reservoirs
 #running the inner function for each reservoir along with the timing of the routing
 
+
+
+#this file will be the outer shell of the Willamette code
+
+#this code will take the inflows as an input (at various timesteps)
+#use balance eqns for reservoirs and control points
+
+#initialize reservoirs
+#running the inner function for each reservoir along with the timing of the routing
+
 import pandas as pd
 import numpy as np
 import xmltodict as xmld
@@ -22,12 +32,21 @@ import sys
 from sklearn import linear_model
 
    
-def simulate(sim_years):
+def simulate(sim_years,job_id):
     
     #%%  load reservoirs and control point infos
     #with open('settings.xml') as fd:
+    #sim_years=5
+    #job_id=15
     with open(str(sys.argv[0])) as fd:
         settings = xmld.parse(fd.read())
+    
+    data_filenames=settings["settings"]['data_inputs']['filenames']
+    controlPoints = settings["settings"]["controlPoints"]['controlPoint']
+    reservoirs = settings["settings"]["reservoirs"]['reservoir']
+    output_filenames=settings["settings"]['data_outputs']['filenames']
+    path=settings["settings"]['data_inputs']['path']
+    path=path['@path']
     
     data_filenames=settings["settings"]['data_inputs']['filenames']
     controlPoints = settings["settings"]["controlPoints"]['controlPoint']
@@ -139,7 +158,7 @@ def simulate(sim_years):
     GOS=CP[7]; WAT=CP[8]; MON=CP[9]; FOS_out=CP[10]; FOS_in=CP[11]
     
     #%% LOAD DATA
-    
+    data_filenames['@inflow_data_filename']=os.path.splitext(data_filenames['@inflow_data_filename'])[0]+"_{}.csv".format(job_id)
     #converters
     cfs_to_cms = 0.0283168
     M3_PER_ACREFT = 1233.4
@@ -408,12 +427,12 @@ def simulate(sim_years):
     #total HP as average hourly production 
     tot_HP=Output_HP.sum(axis=1)
     
-    
+    output_filenames['@hydropower_filename']=os.path.splitext(output_filenames['@hydropower_filename'])[0]+"_{}.xlsx".format(job_id)
     writer = pd.ExcelWriter(os.path.join(str(path),output_filenames['@hydropower_filename']))
     Output_HP.to_excel(writer,'Willamette_HP')
     writer.save()
     
-    
+    output_filenames['@cpDischarge_filename']=os.path.splitext(output_filenames['@cpDischarge_filename'])[0]+"_{}.xlsx".format(job_id)
     #control points
     Output_CP=pd.DataFrame(cp_discharge_all,columns=cp_list)
     writer = pd.ExcelWriter(os.path.join(str(path),output_filenames['@cpDischarge_filename']))
@@ -421,6 +440,7 @@ def simulate(sim_years):
     writer.save()
     
     #summary
+    output_filenames['@summary_filename']=os.path.splitext(output_filenames['@summary_filename'])[0]+"_{}.xlsx".format(job_id)
     Output_release=pd.DataFrame(outflows_all,columns=res_list)
     Output_volume=pd.DataFrame(volumes_all,columns=res_list)
     Output_elev=pd.DataFrame(elevations_all,columns=res_list)

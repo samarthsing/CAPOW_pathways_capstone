@@ -4,7 +4,7 @@ Created on Fri Oct 12 16:20:03 2018
 
 @author: sdenaro
 """
-def launch(sim_years):
+def launch(sim_years,job_id):
     
     import sys
     sys.path.append('Willamette/')
@@ -14,7 +14,8 @@ def launch(sim_years):
     sys.argv = ["Willamette/settings.xml", str(initial_doy)] #simulation inputs
     #starttime = time.time()
     import Willamette_outer
-    Willamette_outer.simulate(sim_years)
+    Willamette_outer.simulate(sim_years,job_id)
+    sys.argv = ["stochastic_engine.py", job_id]
 #elapsed = time.time() - starttime
     
     return None

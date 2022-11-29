@@ -36,11 +36,11 @@ Created on Wed Oct  3 21:29:55 2018
 import pandas as pd
 import numpy as np
 
-def model_setup(pathway,model_year):
+def model_setup(pathway,model_year,job_id):
 
     # Run the following lines if you want to select a random year from the synthetic record
     #to be run through the UC/ED model.
-    df_sim = pd.read_excel('CA_hydropower/CA_hydro_daily.xlsx')
+    df_sim = pd.read_excel('CA_hydropower/CA_hydro_daily_{}.xlsx'.format(job_id))
     sim_years = len(df_sim)/365
     # year = np.random.uniform(0,1,1)*sim_years
     # year = int(np.floor(year))
@@ -61,7 +61,7 @@ def model_setup(pathway,model_year):
         # dispatchable imports and hydropower, and hourly export demand
     
         import CA_exchange_time_series
-        CA_exchange_time_series.exchange(year,scenario)
+        CA_exchange_time_series.exchange(year,scenario,job_id)
     
         ############################################################################
         #                          PNW TIME SERIES SETUP
@@ -72,7 +72,7 @@ def model_setup(pathway,model_year):
     
     
         import PNW_exchange_time_series
-        PNW_exchange_time_series.exchange(year,scenario)
+        PNW_exchange_time_series.exchange(year,scenario,job_id)
     
     
         ############################################################################
@@ -84,12 +84,12 @@ def model_setup(pathway,model_year):
         # the model assumes that nuclear power plants in California have been retired.
         
         import CA_data_setup
-        CA_data_setup.setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff)
+        CA_data_setup.setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff,job_id)
     
     
         # PACIFIC NORTHWEST
         import PNW_data_setup
-        PNW_data_setup.setup(year,scenario,PNW_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff)
+        PNW_data_setup.setup(year,scenario,PNW_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff,job_id)
         
         
         

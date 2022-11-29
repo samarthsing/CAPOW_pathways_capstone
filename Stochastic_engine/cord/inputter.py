@@ -15,6 +15,7 @@ from matplotlib.lines import Line2D
 from .util import *
 import seaborn as sns
 import json
+import os
 
 
 class Inputter():
@@ -96,7 +97,7 @@ class Inputter():
         self.generate_relationships_delta(plot_key)
         self.autocorrelate_residuals_delta(plot_key)
    
-    def run_routine(self, flow_input_type, flow_input_source):
+    def run_routine(self, flow_input_type, flow_input_source,job_id):
         #print('Load New Full-Natural Flows from ' + file_name)
         #self.read_new_fnf_data(file_folder + file_name, timestep_length, start_month, first_leap, start_timestep, end_timestep, number_years, file_has_leap, use_cfs, start_file, end_file)
         #self.whiten_by_historical_moments(number_years, 'XXX')
@@ -109,7 +110,7 @@ class Inputter():
         #self.add_error_delta(number_years, 'XXX')
         #print('Print ORCA Inputs: ' + file_name)
         #self.make_daily_timeseries(number_years, start_timestep, end_timestep, start_year, first_leap, 'N', file_folder, write_name, 0)
-
+        
         start_month = 10
         end_month = 9
         start_year = self.simulation_period_start[flow_input_type][flow_input_source]
@@ -118,7 +119,7 @@ class Inputter():
           if (start_year + first_leap + 1) % 4 == 0:
             break
         self.set_sensitivity_factors()
-        self.read_new_fnf_data(flow_input_type, flow_input_source, start_month, first_leap, number_years)
+        self.read_new_fnf_data(flow_input_type, flow_input_source, start_month, first_leap, number_years,job_id)
         self.whiten_by_historical_moments(number_years, 'XXX')
         self.whiten_by_historical_moments_delta(number_years, 'XXX')
         self.make_fnf_prediction(number_years, 'XXX')
@@ -127,7 +128,7 @@ class Inputter():
         self.find_residuals_delta(start_month, number_years, 'XXX')
         self.add_error(number_years, 'XXX')
         self.add_error_delta(number_years, 'XXX')
-        self.make_daily_timeseries(flow_input_type, flow_input_source, number_years, start_year, start_month, end_month, first_leap, 'N')
+        self.make_daily_timeseries(flow_input_type, flow_input_source, number_years, start_year, start_month, end_month, first_leap, 'N',job_id)
 
 
     def initialize_reservoirs(self):
@@ -809,7 +810,12 @@ class Inputter():
 					
                 reservoir.snowpack['new_melt_fnf'][yearcount] = sensitivity['apr_jul'][yearcount]
 				
-    def read_new_fnf_data(self, flow_input_type, flow_input_source, start_month, first_leap_year, numYears):
+    def read_new_fnf_data(self, flow_input_type, flow_input_source, start_month, first_leap_year, numYears,job_id):
+        #flow_input_type = "forecast_exp"				# observations, downscaled_historical, downscaled_midcentury, downscaled_endcentury
+        #flow_input_source = "F_flow"
+        #start_month=10
+        #first_leap_year=2
+        #numYears=13
         monthcount = start_month - 1
         daycount = 0
         yearcount = 0
@@ -818,6 +824,7 @@ class Inputter():
         leapcount = 0
 		
         filename = self.inflow_series[flow_input_type][flow_input_source]
+        filename =os.path.splitext(filename)[0]+"_{}.csv".format(job_id)
         self.fnf_df = pd.read_csv(filename)
 
 
@@ -1219,7 +1226,7 @@ class Inputter():
                 plt.show()
                 plt.close()
 
-    def make_daily_timeseries(self, flow_input_type, flow_input_source, numYears, start_year, start_month, end_month, first_leap, plot_key):
+    def make_daily_timeseries(self, flow_input_type, flow_input_source, numYears, start_year, start_month, end_month, first_leap, plot_key,job_id):
         start_date = datetime(self.simulation_period_start[flow_input_type][flow_input_source],start_month,1)
         end_date = datetime(self.simulation_period_end[flow_input_type][flow_input_source],end_month,30)
         dates_for_output = pd.date_range(start=start_date, end=end_date, freq='D')
@@ -1362,7 +1369,7 @@ class Inputter():
             else:
                 df_for_output['%s_pump' % deltaname] = pd.Series(self.daily_df_data[deltaname] * multiplier,
                                                                  index=df_for_output.index)
-        df_for_output.to_csv(self.results_folder + '/' + self.export_series[flow_input_type][flow_input_source] + "_"  + str(self.sensitivity_sample_number) + ".csv", index=True, index_label='datetime')
+        df_for_output.to_csv(self.results_folder + '/' + self.export_series[flow_input_type][flow_input_source] + "_"  + str(self.sensitivity_sample_number) +"_"+str(job_id)+ ".csv", index=True, index_label='datetime')
 
         for data_type in self.data_type_list:
             if plot_key == 'Y' and (data_type == 'fnf' or data_type == 'inf'):

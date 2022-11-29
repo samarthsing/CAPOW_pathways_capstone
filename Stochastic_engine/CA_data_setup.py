@@ -8,7 +8,7 @@ Created on Wed May 03 15:01:31 2017
 import pandas as pd
 import numpy as np
 
-def setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff):
+def setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff,job_id):
 
     #read generator parameters into DataFrame
     df_gen = pd.read_csv('CA_data_file/generators.csv',header=0)
@@ -23,8 +23,8 @@ def setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff):
     zones = ['PGE_valley', 'PGE_bay', 'SCE', 'SDGE']
     
     ##time series of load for each zone
-    filename = 'Synthetic_demand_pathflows/Sim_hourly_load_' + scenario + '.csv'
-    df_load = pd.read_csv(filename,header=0)
+    filename = 'Synthetic_demand_pathflows/Sim_hourly_load_' + scenario + '_{}.csv'
+    df_load = pd.read_csv(filename.format(job_id),header=0)
     df_load = df_load[zones]
     df_load = df_load.loc[year*8760:year*8760+8759]
     df_load = df_load.reset_index(drop=True)
@@ -38,10 +38,10 @@ def setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff):
     df_reserves.columns = ['reserves']
     
     ##daily hydropower availability
-    df_hydro = pd.read_csv('Hydro_setup/CA_dispatchable_hydro.csv',header=0)
+    df_hydro = pd.read_csv('Hydro_setup/CA_dispatchable_hydro_{}.csv'.format(job_id),header=0)
     
     ##time series of wind generation for each zone
-    df_wind = pd.read_csv('Synthetic_wind_power/wind_power_sim.csv',header=0)
+    df_wind = pd.read_csv('Synthetic_wind_power/wind_power_sim_{}.csv'.format(job_id),header=0)
     header = scenario + '_CAISO'
     df_wind = df_wind.loc[:,header]
     df_wind = df_wind.loc[year*8760:year*8760+8759]
@@ -50,7 +50,7 @@ def setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff):
     
     
     ##time series solar for each TAC
-    df_solar = pd.read_csv('Synthetic_solar_power/solar_power_sim.csv',header=0)
+    df_solar = pd.read_csv('Synthetic_solar_power/solar_power_sim_{}.csv'.format(job_id),header=0)
     header = scenario + '_CAISO'
     df_solar = df_solar.loc[:,header]
     df_solar = df_solar.loc[year*8760:year*8760+8759]
@@ -58,28 +58,28 @@ def setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff):
     solar_caps = pd.read_excel('CA_data_file/solar_caps.xlsx')
     
     ##daily time series of dispatchable imports by path
-    filename = 'Path_setup/CA_dispatchable_imports_' + scenario + '.csv'
-    df_imports = pd.read_csv(filename,header=0)
+    filename = 'Path_setup/CA_dispatchable_imports_' + scenario + '_{}.csv'
+    df_imports = pd.read_csv(filename.format(job_id),header=0)
     
     ##hourly time series of exports by zone
-    filename = 'Path_setup/CA_exports_' + scenario + '.csv'
-    df_exports = pd.read_csv(filename,header=0)
+    filename = 'Path_setup/CA_exports_' + scenario + '_{}.csv'
+    df_exports = pd.read_csv(filename.format(job_id),header=0)
     
     #must run resources (LFG,ag_waste,nuclear)
     df_must = pd.read_excel('CA_data_file/must_run.xlsx',header=0)
     
     #natural gas prices
-    df_ng = pd.read_excel('Gas_prices/NG.xlsx', header=0)
+    df_ng = pd.read_excel('Gas_prices/NG_{}.xlsx'.format(job_id), header=0)
     df_ng = df_ng[zones]
     df_ng = df_ng.loc[year*365:year*365+364,:]
     df_ng = df_ng.reset_index(drop=True)
     
     #california imports hourly minimum flows
-    filename = 'Path_setup/CA_path_mins_' + scenario + '.csv'
-    df_CA_import_mins = pd.read_csv(filename, header=0)
+    filename = 'Path_setup/CA_path_mins_' + scenario + '_{}.csv'
+    df_CA_import_mins = pd.read_csv(filename.format(job_id), header=0)
     
     #california hydro hourly minimum flows
-    df_CA_hydro_mins = pd.read_csv('Hydro_setup/CA_hydro_mins.csv', header=0)
+    df_CA_hydro_mins = pd.read_csv('Hydro_setup/CA_hydro_mins_{}.csv'.format(job_id), header=0)
       
     # must run generation
     must_run_PGE_bay = np.ones((len(df_load),1))*df_must.loc[0,'PGE_bay']
@@ -88,7 +88,7 @@ def setup(year,scenario,CAISO_bat_cap,bat_RoC_coeff,bat_RoD_coeff,bat_eff):
     must_run_SDGE = np.ones((len(df_load),1))*df_must.loc[0,'SDGE']
     must_run = np.column_stack((must_run_PGE_valley,must_run_PGE_bay,must_run_SCE,must_run_SDGE))
     df_total_must_run =pd.DataFrame(must_run,columns=('PGE_valley','PGE_bay','SCE','SDGE'))
-    df_total_must_run.to_csv('CA_data_file/must_run_hourly.csv')
+    df_total_must_run.to_csv('CA_data_file/must_run_hourly_{}.csv'.format(job_id))
     
     
     ############

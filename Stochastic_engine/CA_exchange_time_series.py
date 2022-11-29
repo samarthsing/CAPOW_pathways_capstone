@@ -9,10 +9,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-def exchange(year,scenario):
+def exchange(year,scenario,job_id):
     
-    filename = 'Synthetic_demand_pathflows/Load_Path_Sim_' + scenario + '.csv'    
-    df_data = pd.read_csv(filename,header=0)
+    filename = 'Synthetic_demand_pathflows/Load_Path_Sim_' + scenario + '_{}.csv'    
+    df_data = pd.read_csv(filename.format(job_id),header=0)
     c = ['Path66_sim','Path46_sim','Path61_sim','Path42_sim','Path24_sim','Path45_sim']
     df_data = df_data[c]
     paths = ['Path66','Path46','Path61','Path42','Path24','Path45']
@@ -45,8 +45,8 @@ def exchange(year,scenario):
                     
     imports.rename(columns={'Path46':'Path46_SCE'}, inplace=True)
     
-    filename = 'Path_setup/CA_imports_' + scenario + '.csv'
-    imports.to_csv(filename)
+    filename = 'Path_setup/CA_imports_' + scenario + '_{}.csv'
+    imports.to_csv(filename.format(job_id))
     
     # convert to minimum flow time series and dispatchable (daily)
     df_mins = pd.read_excel('Path_setup/CA_imports_minflow_profiles.xlsx',header=0)
@@ -63,8 +63,8 @@ def exchange(year,scenario):
                 imports.loc[i,L] = np.max((0,imports.loc[i,L]-df_mins.loc[i,L]))
     
     dispatchable_imports = imports*24
-    filename = 'Path_setup/CA_dispatchable_imports_' + scenario + '.csv'
-    dispatchable_imports.to_csv(filename)
+    filename = 'Path_setup/CA_dispatchable_imports_' + scenario + '_{}.csv'
+    dispatchable_imports.to_csv(filename.format(job_id))
     
     df_data = imports.copy(deep=True)
     
@@ -79,12 +79,12 @@ def exchange(year,scenario):
             
     H = pd.DataFrame(hourly)
     H.columns = ['Path66','Path46_SCE','Path61','Path42']
-    filename = 'Path_setup/CA_path_mins_' + scenario + '.csv'
-    H.to_csv(filename)
+    filename = 'Path_setup/CA_path_mins_' + scenario + '_{}.csv'
+    H.to_csv(filename.format(job_id))
     
     # hourly exports
-    filename = 'Synthetic_demand_pathflows/Load_Path_Sim_' + scenario + '.csv'
-    df_data = pd.read_csv(filename,header=0)
+    filename = 'Synthetic_demand_pathflows/Load_Path_Sim_' + scenario + '_{}.csv'
+    df_data = pd.read_csv(filename.format(job_id),header=0)
     c = ['Path66_sim','Path46_sim','Path61_sim','Path42_sim','Path24_sim','Path45_sim']
     df_data = df_data[c]
     df_data.columns = [paths]
@@ -130,8 +130,8 @@ def exchange(year,scenario):
     
     exports = pd.DataFrame(e) 
     exports.columns = ['Path42','Path24','Path45','Path66']
-    filename = 'Path_setup/CA_exports_' + scenario + '.csv'
-    exports.to_csv(filename)
+    filename = 'Path_setup/CA_exports_' + scenario + '_{}.csv'
+    exports.to_csv(filename.format(job_id))
     
     
     
@@ -142,7 +142,7 @@ def exchange(year,scenario):
     
     # convert to minimum flow time series and dispatchable (daily)
     
-    df_data = pd.read_excel('CA_hydropower/CA_hydro_daily.xlsx',header=0,index_col=0)
+    df_data = pd.read_excel('CA_hydropower/CA_hydro_daily_{}.xlsx'.format(job_id),header=0,index_col=0)
     dhydro = df_data.loc[year*365:year*365+364,:]
     dhydro = dhydro.reset_index(drop=True)
     dhydro=dhydro.values
@@ -168,12 +168,12 @@ def exchange(year,scenario):
             else:
                 dhydro.loc[i,z] = np.max((0,dhydro.loc[i,z]-df_mins.loc[i,z]*24))
     
-    dhydro.to_csv('Hydro_setup/CA_dispatchable_hydro.csv')
+    dhydro.to_csv('Hydro_setup/CA_dispatchable_hydro_{}.csv'.format(job_id))
     
     # hourly minimum flow for hydro
     hourly = np.zeros((8760,len(zones)))
     
-    df_data = pd.read_excel('CA_hydropower/CA_hydro_daily.xlsx',header=0,index_col=0)
+    df_data = pd.read_excel('CA_hydropower/CA_hydro_daily_{}.xlsx'.format(job_id),header=0,index_col=0)
     hydro = df_data.loc[year*365:year*365+364,:].values
     PGE_ALL=hydro[:,0]/0.837
     SCE_all=hydro[:,1]/0.8016
@@ -192,6 +192,6 @@ def exchange(year,scenario):
             
     H = pd.DataFrame(hourly)
     H.columns = zones
-    H.to_csv('Hydro_setup/CA_hydro_mins.csv')
+    H.to_csv('Hydro_setup/CA_hydro_mins_{}.csv'.format(job_id))
 
     return None

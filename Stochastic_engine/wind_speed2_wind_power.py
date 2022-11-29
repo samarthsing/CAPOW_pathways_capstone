@@ -25,7 +25,7 @@ import scenario_chooser
 # for each sub-zone (PG&E, SCE, SDGE in a separate script)
 ########################################################
 
-def wind_sim(sim_years):
+def wind_sim(sim_years,job_id):
     
     sim_years = sim_years+3
     
@@ -115,7 +115,7 @@ def wind_sim(sim_years):
     #pull relevant fields (not all meteorological stations are used in regressions)
     S = list(df_data)
     fields = S[5:]
-    df_sim = pd.read_csv('Synthetic_weather/synthetic_weather_data.csv',header=0)
+    df_sim = pd.read_csv('Synthetic_weather/synthetic_weather_data_{}.csv'.format(job_id),header=0)
     df_sim = df_sim[fields]
     df_sim = df_sim.loc[0:365*sim_years-1,:]
     
@@ -525,6 +525,6 @@ def wind_sim(sim_years):
             #df_M.columns = ['BPA','PNW','CAISO']
             #df_M.to_csv('Synthetic_wind_power/wind_power_sim.csv')
             
-    df_M.to_csv('Synthetic_wind_power/wind_power_sim.csv', index = None, header = True)
+    df_M.to_csv('Synthetic_wind_power/wind_power_sim_{}.csv'.format(job_id), index = None, header = True)
             
     return None

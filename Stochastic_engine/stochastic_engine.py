@@ -5,7 +5,7 @@ Created on Wed Sep 19 09:59:48 2018
 """
 
 import pandas as pd
-
+import sys
 
 #############################################################################
 ## HISTORICAL WEATHER AND STREAMFLOW ANALYSIS
@@ -26,15 +26,16 @@ starttime = time.time()
 # End dates (stoch_years) must be + 3 years beyond desired end of simulation. Note that
 # inflow files for ORCA (input/forecast_flows.csv) needs to include leap days. 
 
-stoch_years=103
+stoch_years=5
 
 # Generate synthetic weather (wind speed and temperature) records. 
-#import synthetic_temp_wind_v3
-#synthetic_temp_wind_v3.synthetic(stoch_years)
+import synthetic_temp_wind_v2
+synthetic_temp_wind_v2.synthetic(stoch_years,sys.argv[1])
 #print('synth weather')
 #
 ## Generate synthetic streamflow records 
-#import synthetic_streamflow_v2
+import synthetic_streamflow_v2
+synthetic_streamflow_v2.stream_flow(sys.argv[1])
 #print('streamflows')
 
 ##############################################################################
@@ -43,29 +44,29 @@ stoch_years=103
 ## DAILY HYDROPOWER SIMULATION
 #
 # Now specify a smaller subset of stochastic data to run (must be <= stoch years-3)
-sim_years = 100
+sim_years = 2
 #
 # Run ORCA to get California storage dam releases
 import main
-main.sim(sim_years)
+main.sim(sim_years,sys.argv[1])
 print('ORCA')
 #
 # California Hydropower model
 import CA_hydropower
-CA_hydropower.hydro(sim_years)
+CA_hydropower.hydro(sim_years,sys.argv[1])
 print('CA hydropower')
 
 #Willamette operational model
 import Willamette_launch
-Willamette_launch.launch(sim_years)
+Willamette_launch.launch(sim_years,sys.argv[1])
 print('Willamette')
 
 
 # Federal Columbia River Power System Model (mass balance in Python)
 import ICF_calc_new
-ICF_calc_new.calc(sim_years)
-import FCRPS_New
-FCRPS_New.simulate(sim_years)
+ICF_calc_new.calc(sim_years,sys.argv[1])
+import FCRPS_New_Historical
+FCRPS_New_Historical.simulate(sim_years,sys.argv[1])
 print('FCRPS')
 
 #############################################################################
@@ -76,13 +77,13 @@ print('FCRPS')
     # Generate synthetic hourly wind power production time series for the BPA and
     # CAISO zones for the entire simulation period
 import wind_speed2_wind_power
-wind_speed2_wind_power.wind_sim(sim_years)
+wind_speed2_wind_power.wind_sim(sim_years,sys.argv[1])
 print('wind')
 
 # Generate synthetic hourly solar power production time series for 
 # the CAISO zone for the entire simulation period
 import solar_production_simulation2
-solar_production_simulation2.solar_sim(sim_years)
+solar_production_simulation2.solar_sim(sim_years,sys.argv[1])
 print('solar')
 ##############################################################################
 #
@@ -94,6 +95,7 @@ print('solar')
 # core UC/ED model (CAISO, Mid-C markets) and other WECC zones
 
 import demand_pathflows_efficient
+demand_pathflows_efficient.demand(sys.argv[1])
 print('paths')
 ##############################################################################
 #
@@ -115,7 +117,7 @@ ng[:,4] = ng[:,4]*5.13
 import pandas as pd
 NG = pd.DataFrame(ng)
 NG.columns = ['SCE','SDGE','PGE_valley','PGE_bay','PNW']
-NG.to_excel('Gas_prices/NG.xlsx')
+NG.to_excel('Gas_prices/NG_{}.xlsx'.format(sys.argv[1]))
 
 #Scenarios: 'MID' = Mid-Case (S1), 'EV' = High EV Adoption (S2), 'BAT' = Low Battery Storage Cost (S3)
 #   'LOWRECOST' = Low RE Cost / High Gas Price (S4), 'HIGHRECOST' = High RE Cost / Low Gas Price (S5)
@@ -141,7 +143,7 @@ for pathway in pathways:
         #############################################################################
         #MODEL SETUP (UCED_setup file converted to function to iterate through each scenario/year combination)
         import UCED_setup
-        UCED_setup.model_setup(pathway,j)
+        UCED_setup.model_setup(pathway,j,sys.argv[1])
 
 
 

@@ -8,10 +8,10 @@ Created on Mon May 27 11:13:15 2019
 from __future__ import division
 import pandas as pd 
 import numpy as np
-#from datetime import datetime
-#import matplotlib.pyplot as plt
+from datetime import datetime
+import matplotlib.pyplot as plt
     
-def hydro(sim_years):
+def hydro(sim_years,job_id):
         
     #########################################################################
     # This purpose of this script is to use synthetic streamflows at major California
@@ -32,11 +32,11 @@ def hydro(sim_years):
     calender = pd.read_excel('CA_hydropower/calender.xlsx',header=0)
     
     # load simulated full natural flows at each California storage reservoir (ORCA site)
-    df_sim = pd.read_csv('Synthetic_streamflows/synthetic_streamflows_CA.csv',header=0,index_col=0)
+    df_sim = pd.read_csv('Synthetic_streamflows/synthetic_streamflows_CA_{}.csv'.format(job_id),header=0,index_col=0)
     df_sim = df_sim.loc[0:(sim_years+3)*365,:]
        
     # load simulated outflows calculated by ORCA
-    df_ORCA = pd.read_csv('ORCA_output.csv')
+    df_ORCA = pd.read_csv('ORCA_output_{}.csv'.format(job_id))
     outflow_sites = ['SHA_otf','ORO_otf','YRS_otf','FOL_otf','NML_otf','DNP_otf','EXC_otf','MIL_otf','ISB_otf','SUC_otf','KWH_otf','PFT_otf']
     for i in range(0,len(df_ORCA)):       
         for s in outflow_sites:
@@ -575,11 +575,11 @@ def hydro(sim_years):
     
     df_PGE = pd.DataFrame(M_PGE)
     df_PGE.columns = PGE_name_list
-    df_PGE.to_excel('PGE_output.xlsx')
+    df_PGE.to_excel('PGE_output_{}.xlsx'.format(job_id))
     
     df_SCE = pd.DataFrame(M_SCE)
     df_SCE.columns = SCE_name_list
-    df_SCE.to_excel('SCE_output.xlsx')
+    df_SCE.to_excel('SCE_output_{}.xlsx'.format(job_id))
     
     
     PGE_total=np.sum(M_PGE,axis=1)
@@ -627,7 +627,7 @@ def hydro(sim_years):
     
     df_D = pd.DataFrame(combined)
     df_D.columns = ['PGE_valley','SCE']
-    df_D.to_excel('CA_hydropower/CA_hydro_daily.xlsx')
+    df_D.to_excel('CA_hydropower/CA_hydro_daily_{}.xlsx'.format(job_id))
         
     return None 
     

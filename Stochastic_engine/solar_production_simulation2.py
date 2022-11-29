@@ -13,7 +13,7 @@ from datetime import datetime
 from datetime import timedelta
 import scenario_chooser
 
-def solar_sim(sim_years):
+def solar_sim(sim_years,job_id):
 
     sim_years=sim_years+3
     df_CAISO = pd.read_excel('Synthetic_wind_power/renewables_2011_2017.xlsx',sheet_name='CAISO',header=0)
@@ -120,7 +120,7 @@ def solar_sim(sim_years):
         locals()[name].fit(x,y)
     #        print(locals()[name].score(x,y))
         
-    Syn_irr=pd.read_csv('Synthetic_weather/synthetic_irradiance_data.csv',header=0,index_col=0)
+    Syn_irr=pd.read_csv('Synthetic_weather/synthetic_irradiance_data_{}.csv'.format(job_id),header=0,index_col=0)
     Syn_irr = Syn_irr.loc[0:365*sim_years-1,:]
     
     Normal_Starting=datetime(1900,1,1)
@@ -292,7 +292,7 @@ def solar_sim(sim_years):
         locals()[name].fit(x,y)
     #        print(locals()[name].score(x,y))
         
-    Syn_irr=pd.read_csv('Synthetic_weather/synthetic_irradiance_data.csv',header=0,index_col=0)
+    Syn_irr=pd.read_csv('Synthetic_weather/synthetic_irradiance_data_{}.csv'.format(job_id),header=0,index_col=0)
     Syn_irr = Syn_irr.loc[0:365*sim_years-1,:]
     
     Normal_Starting=datetime(1900,1,1)
@@ -457,6 +457,6 @@ def solar_sim(sim_years):
             solar_sim_BPA = solar_sim_BPA[8760:h-2*8760,:]
             df_S[pathway + "_" + str(year) + "_PNW"] = solar_sim_BPA[:,0]
                   
-    df_S.to_csv('Synthetic_solar_power/solar_power_sim.csv', index = None, header = True)
+    df_S.to_csv('Synthetic_solar_power/solar_power_sim_{}.csv'.format(job_id), index = None, header = True)
         
     return None
